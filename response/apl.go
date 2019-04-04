@@ -16,6 +16,7 @@ type APLBuilder struct {
 
 type APLDocument map[string]interface {}
 type APLDataSources map[string]interface {}
+type APLDataSource map[string]interface {}
 
 func NewAPLBuilder(datatype string, version string, document string, datasources *APLDataSources) *APLBuilder {
   return &APLBuilder{
@@ -26,7 +27,21 @@ func NewAPLBuilder(datatype string, version string, document string, datasources
   }
 }
 
+func NewAPLDataSources() *APLDataSources {
+  return &APLDataSources{}
+}
 
+func (ds *APLDataSources)NewAPLDataSource(id string, objecttype string) *APLDataSource {
+  src := &APLDataSource{}
+  (*src)["type"] = objecttype
+  (*src)["properties"] = make(map[string]interface{})
+  (*ds)[id] = src
+  return src
+}
+
+func (ds *APLDataSource)AddData(id string, val interface{}) {
+  (*ds)["properties"].(map[string]interface{})[id] = val
+}
 
 func (builder *APLBuilder) Build() Directive {
   
