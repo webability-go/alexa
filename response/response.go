@@ -5,7 +5,7 @@ import (
 )
 
 const (
-  GENERATOR = "kiwiask-1.0.0/GO/Kiwilimon"
+GENERATOR = "alexa-1.0.0/Webability/GO"
 )
 
 // MAIN ALEXA RESPONSE STRUCTURE
