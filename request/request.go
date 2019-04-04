@@ -3,7 +3,7 @@ package request
 import (
 //  "fmt"
 
-  "../attributes"
+  "github.com/webability-go/alexa/attributes"
 )
 
 type AlexaRequest struct {
