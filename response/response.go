@@ -1,7 +1,7 @@
 package response
 
 import (
-  "../attributes"
+  "github.com/webability-go/alexa/attributes"
 )
 
 const (
