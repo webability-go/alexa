@@ -1,8 +1,8 @@
 package alexa
 
 import (
-  "./request"
-  "./response"
+  "github.com/webability-go/alexa/request"
+  "github.com/webability-go/alexa/response"
 )
 
 const (

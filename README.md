@@ -45,14 +45,18 @@ go build skill.go
 zip -a skill.zip skill
 ```
 
-Then import your zip file to your lambda funcion, with language GO 1.x
+Then import your zip file to your lambda function, with language GO 1.x
 Name the Controler to the name of your executable (in this case, "skill")
 
-And the skill works, magically.
-It will tell the intents you say, for example:
+( I will pass the "how to creates and compile an interaction model and link it with your lambda function", 
+  there are enough tutorials of that already )
+
+Once it is all linked, launch your skill in your test environment, and the skill works, magically.
+
+It will tell the intents you say, for example if you invoke your skill with "my skill to test":
 
 ```
-User: "Alexa, open skill"
+User: "Alexa, open my skill to test"
 Alexa: "Alexa Skill Default Launch Handler."
 User: "Help"
 Alexa: "Alexa Skill Default Handler For HelpIntent"
