@@ -5,7 +5,7 @@ import (
 )
 
 const (
-GENERATOR = "alexa-1.0.0/Webability/GO"
+  GENERATOR = "alexa-1.0.0/Webability/GO"
 )
 
 // MAIN ALEXA RESPONSE STRUCTURE
