@@ -3,9 +3,9 @@ package alexa
 import (
   "fmt"
   
-  "./locale"
-  "./request"
-  "./response"
+  "github.com/webability-go/alexa/locale"
+  "github.com/webability-go/alexa/request"
+  "github.com/webability-go/alexa/response"
 )
 
 func DefaultHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
