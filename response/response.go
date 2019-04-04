@@ -1,11 +1,11 @@
 package response
 
 import (
-  "github.com/webability-go/alexa/attributes"
+  "../attributes"
 )
 
 const (
-  GENERATOR = "alexa-1.0.0/Webability/GO"
+  GENERATOR = "kiwiask-1.0.0/GO/Kiwilimon"
 )
 
 // MAIN ALEXA RESPONSE STRUCTURE
@@ -132,7 +132,7 @@ type DirectiveRenderTemplate struct {
 // APL Templates
 type DirectiveAPL struct {
   DirectiveCommon
-  Document              APLDocument              `json:"template"`
+  Document              APLDocument              `json:"document"`
   Datasources           *APLDataSources          `json:"datasources,omitempty"`
   Token                 string                   `json:"token"`
 }
