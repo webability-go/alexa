@@ -132,7 +132,7 @@ type DirectiveRenderTemplate struct {
 // APL Templates
 type DirectiveAPL struct {
   DirectiveCommon
-  Document              APLDocument              `json:"template"`
+  Document              APLDocument              `json:"document"`
   Datasources           *APLDataSources          `json:"datasources,omitempty"`
   Token                 string                   `json:"token"`
 }
