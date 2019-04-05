@@ -77,6 +77,11 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.0.2 - 2019 ??
+-----------------------
+- Full implementation of BodyTemplate1, BodyTemplate2, BodyTemplate3 (WithToken, WithTitle, WithBackButton, WithImage, WithBackgroundImage, WithPrimaryText) 
+- Functions added to control DisplayImage and TextContent objects (WithSize, WithPrimaryText, WithSecondaryText, WithTertiaryText, AddSource)
+
 V0.0.1 - 2019-04-04
 -----------------------
 - Framework working, SDK working
@@ -87,9 +92,146 @@ V0.0.1 - 2019-04-04
 # Reference Manual:
 =======================
 
+Define Handlers map:
 
+```
+package main
 
+import (
+  ...
 
+  "github.com/webability-go/alexa/request"
+  "github.com/webability-go/alexa/response"
+)
+
+// Build the handlers map befor calling the start
+// The full supported handlers are in handlersmap.go library for reference
+
+func main()
+{
+  // Handlers types:
+  alexa.AddHandlersType(map[string]func(request.AlexaRequest) *response.AlexaResponse {
+    alexa.LaunchRequest: yourLaunchHandler,
+    alexa.SessionEndedRequest: yourSessionEndedHandler,
+  })
+
+  // Handlers intents:
+  alexa.AddHandlersIntent(map[string]func(request.AlexaRequest) *response.AlexaResponse {
+    // native intents
+    alexa.CancelIntent:                  yourCancelIntentHandler,
+    alexa.StopIntent:                    yourCancelIntentHandler,
+    alexa.HelpIntent:                    yourHelpIntentHandler,
+    alexa.NextIntent:                    yourNextIntentHandler,
+    alexa.PreviousIntent:                yourPreviousIntentHandler,
+    alexa.RepeatIntent:                  yourRepeatIntentHandler,
+    alexa.StartOverIntent:               yourStartOverIntentHandler,
+    alexa.MoreIntent:                    yourMoreIntentHandler,
+    alexa.ElementSelectedHandler:        yourElementSelectedHandler,
+    
+    // custom intents
+    "yourOwnIntent":                     yourOwnIntentHandler,
+    "anotherCurtomIntent":               yourAnotherCustomIntentHandler,
+    "navigationIntent":                  yourNavigationIntentHandler,
+  })
+
+  alexa.Start()
+}
+
+// ======================================================================
+// EXAMPLE: LAUNCH HANDLER
+// ======================================================================
+func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
+
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support SSML (mandatory)
+  speech := response.NewSSMLBuilder()
+  speech.Say("Welcome to Demo Skill")
+  resp.AddSpeech(speech);
+
+  // support CARD
+  card := response.NewCardBuilder( "Welcome", "Welcome to Demo Skill", "https://yourcdn.com/icon-1024.png", "https://yourcdn.com/icon-192.png" )
+  resp.AddCard(card);
+  
+  // support TEMPLATE
+  template := response.NewTemplateBuilder("BodyTemplate3").(*response.BodyTemplate3)
+  template.WithTitle("Example:")
+  template.WithImage("https://yourcdn.com/icon-1024.png");
+  template.WithPrimaryRichText("<div align='center'>Help.<br/>Start over.<br/>Close the skill.</div>");
+  resp.AddTemplate(template);
+  
+  // support APL
+  aplsources := response.NewAPLDataSources()
+  apldata := aplsources.NewAPLDataSource("welcomedata", "object")
+  apldata.AddData("logo", "https://yourcdn.com/icon-192.png")
+  apldata.AddData("image", "https://yourcdn.com/icon-1024.png")
+  apldata.AddData("maintitle", "Welcome")
+  apldata.AddData("titleshort", "Examples:")
+  apldata.AddData("title", "Examples of what you can say:")
+  apldata.AddData("subtitle", "Search something, Make an action like that:")
+  apldata.AddData("primaryText", "Help.<br/>Start over.<br/>Close the skill.<br/>Say something intelligent.")
+  
+  apl := response.NewAPLBuilder( "Alexa.Presentation.APL.RenderDocument", "1.0", "./application/apl/yourapl.json", aplsources )
+  resp.AddAPL(apl);
+  
+  return resp
+}
+
+// all the other defined handlers
+
+```
+
+Attributes:
+
+```
+  // Before start:
+  alexa.WithDynamoDbClient("latest", REGION)
+  alexa.WithTableName(KIWITABLA)
+  alexa.WithAutoCreateTable(true)
+  alexa.Start()
+```
+
+Request data: ( pass the IsNil interface to alexa code with new functions HasDisplay, HasVideo, HasAPL )
+
+```
+  display := Request.GetDisplay()          // object
+  video := Request.GetVideo()              // object
+  apl := Request.GetAPL()                  // object
+
+  newSession := Request.GetNewSession()    // bool
+  locale := Request.GetLocale()            // string es_MX
+```
+  
+
+Use attributes:
+
+```
+  att := Request.GetAttributes()
+  ...
+  att["Seomthing"] = "Some data"
+
+  resp.AddAttributes(att)     // rename to SetAttributes ?   ADD should Ads something to a set of attributes.
+   // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
+   
+```
+
+Locale:
+
+```
+
+```
+
+Build a Speech / SSML
+======================
+
+Build a Card
+======================
+
+Build a Template
+======================
+
+Build an APL
+======================
 
 
 ---
