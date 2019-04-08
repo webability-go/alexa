@@ -1,12 +1,21 @@
 package response
 
 import (
+  "strings"
+
   "github.com/webability-go/alexa/attributes"
 )
 
 const (
-  GENERATOR = "alexa-1.0.0/Webability/GO"
+  GENERATOR             =                        "alexa-1.0.0/Webability/GO"
+  
+  IMAGESOURCE_X_SMALL   =                        "X_SMALL"
+  IMAGESOURCE_SMALL     =                        "SMALL"
+  IMAGESOURCE_MEDIUM    =                        "MEDIUM"
+  IMAGESOURCE_LARGE     =                        "LARGE"
+  IMAGESOURCE_X_LARGE   =                        "X_LARGE"
 )
+
 
 // MAIN ALEXA RESPONSE STRUCTURE
 type AlexaResponse struct {
@@ -139,6 +148,63 @@ type DirectiveAPL struct {
 
 // *** APL templates implemented into apl.go
 
+// Structured elements functionality
+func analyzeText(text string) string {
+  
+  // if text contains < > tags, it's a rich text, if not, a normal text
+  posinf := strings.Index(text, "<")
+  possup := strings.Index(text, "<")
+  if posinf != -1 && possup != -1 {
+    return "RichText"
+  }
+  return "PlainText"
+}
+
+func (tc *TextContent)WithPrimaryText(text string) {
+  texttype := analyzeText(text)
+  tc.PrimaryText = &TextField{ Type: texttype, Text: text, }
+}
+
+func (tc *TextContent)WithSecondaryText(text string) {
+  texttype := analyzeText(text)
+  tc.SecondaryText = &TextField{ Type: texttype, Text: text, }
+}
+
+func (tc *TextContent)WithTertiaryText(text string) {
+  texttype := analyzeText(text)
+  tc.TertiaryText = &TextField{ Type: texttype, Text: text, }
+}
+
+func (di *DisplayImage)AddSource(url string) *ImageSource {
+  src := &ImageSource{ URL: url, }
+  if di.Sources == nil {
+    di.Sources = &[]ImageSource{ *src }
+  } else {
+    *di.Sources = append(*di.Sources, *src)
+  }
+  return src
+}
+
+func (is *ImageSource)WithURL(url string) {
+  is.URL = url
+}
+
+// size is IMAGESOURCE_X_SMALL to X_LARGE
+// if width or height are 0, they are ignored
+func (is *ImageSource)WithSize(size string, width int, height int) {
+  is.Size = size
+  is.WidthPixels = width
+  is.HeightPixels = height
+}
+
+
+
+
+
+
+
+
+
 
 
 // Basic Response creator
@@ -154,6 +220,19 @@ func NewResponse(close bool) *AlexaResponse {
 }
 
 // Some Common responses pre-build
+func NewTextResponse(text interface{}, close bool) *AlexaResponse {
+
+// be intelligent:
+// if text is string and no tags, simple text
+// if text is string and some tags: ssml text, check if <speak> is here and adds it if not
+// if text is ssml speech object, build it and inject it as ssml text
+
+  r := &AlexaResponse{}
+  return r
+}
+
+
+// disappear this function wher NewTextResponse is done
 func NewSSMLResponse(text string, close bool) *AlexaResponse {
   r := &AlexaResponse{
     Version: "1.0",
@@ -170,6 +249,14 @@ func NewSSMLResponse(text string, close bool) *AlexaResponse {
 }
 
 func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
+  
+// be intelligent: text as interface{}
+// if text is string and no tags, simple text
+// if text is string and some tags: ssml text, check if <speak> is here and adds it if not
+// if text is ssml speech object, build it and inject it as ssml text
+
+// gets text for card from original text stripping tags and etc (some painter function to transform it)
+  
   r := &AlexaResponse{
     Version: "1.0",
     Response: Response{
@@ -184,7 +271,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
       },
       ShouldEndSession: close,
     },
-    UserAgent: "kiwiask-1.0.0/GO/Kiwilimon",
+    UserAgent: GENERATOR,
   }
   return r
 }
@@ -198,6 +285,12 @@ func (r *AlexaResponse)AddAttributes(attributes *attributes.Attributes) *AlexaRe
 }
 
 func (r *AlexaResponse)AddSpeech(speech *SSMLBuilder) {
+  
+// be intelligent: text as interface{}
+// if text is string and no tags, simple text
+// if text is string and some tags: ssml text, check if <speak> is here and adds it if not
+// if text is ssml speech object, build it and inject it as ssml text
+  
   if r.Response.OutputSpeech == nil {
     r.Response.OutputSpeech = &OutputSpeech{
         Type: "SSML",
