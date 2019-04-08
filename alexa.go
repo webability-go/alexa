@@ -4,6 +4,8 @@ import (
   "github.com/aws/aws-lambda-go/lambda"
 )
 
+const VERSION = "0.0.2"
+
 var DEVEL = false
 
 /*

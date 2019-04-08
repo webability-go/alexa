@@ -69,18 +69,19 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 
 TO DO:
 ======
-- Full Templates support (if works but not all the posibilities)
-- Full APL support (if works but not all the posibilities)
+- Full APL support (it works but not all the posibilities)
 - DynamoDB support to load/save attributes
+- Ask Amazon API for user data
 
 
 Version Changes Control
 =======================
 
-v0.0.2 - 2019 ??
+v0.0.2 - 2019-04-08
 -----------------------
 - Full implementation of BodyTemplate1, BodyTemplate2, BodyTemplate3 (WithToken, WithTitle, WithBackButton, WithImage, WithBackgroundImage, WithPrimaryText) 
 - Functions added to control DisplayImage and TextContent objects (WithSize, WithPrimaryText, WithSecondaryText, WithTertiaryText, AddSource)
+- Full implementation of ListTemplate1, ListTemplate2 and ListItem (WithToken, WithTitle, WithBackButton, WithImage, WithBackgroundImage, AddListItem) 
 
 V0.0.1 - 2019-04-04
 -----------------------
