@@ -83,6 +83,7 @@ v0.0.3 - 2019-04-09
 - Added HasVideo, HasDisplay and HasAPL in request implementation
 - Request, Intent and Slots ordered and cleaned
 - Added Request.GetSlots function
+- Added attributes basic access functions (Set, Get, GetInt, GetBool, GetString, GetFloat)
 
 
 v0.0.2 - 2019-04-08
