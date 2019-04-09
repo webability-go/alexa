@@ -2,6 +2,7 @@ package request
 
 import (
 //  "fmt"
+  "reflect"
 
   "github.com/webability-go/alexa/attributes"
 )
@@ -88,49 +89,49 @@ type Context struct {
 
 /* Partially implemented for now */
 type Request struct {
-  Type        string `json:"type"`
-  RequestID   string `json:"requestId"`
-  Timestamp   string `json:"timestamp"`
-  Locale      string `json:"locale"`
-  // we ignore target
-  // we ignore metadata
-  Intent      Intent `json:"intent,omitempty"`
-  // we ignore body
-  // we ignore payload
-  // we ignore targetURI
-  // we ignore launchRequestType
-  // we ignore shouldLinkResultBeReturned
-  // Reason      string `json:"reason,omitempty"`
+  Type                  string                   `json:"type"`
+  RequestID             string                   `json:"requestId"`
+  Timestamp             string                   `json:"timestamp"`
+  Locale                string                   `json:"locale"`
+  // we ignore target for now
+  // we ignore metadata for now
+  Intent                Intent                   `json:"intent,omitempty"`
+  // we ignore body for now
+  // we ignore payload for now
+  // we ignore targetURI for now
+  // we ignore launchRequestType for now
+  // we ignore shouldLinkResultBeReturned for now
+  // Reason      string `json:"reason,omitempty"` we ignore for now
   DialogState string `json:"dialogState,omitempty"`
 }
 
 type Intent struct {
-  Name  string          `json:"name"`
-  ConfirmationStatus  string `json:"confirmationStatus"`
-  Slots map[string]Slot `json:"slots"`
+  Name                  string                   `json:"name"`
+  ConfirmationStatus    string                   `json:"confirmationStatus"`
+  Slots                 map[string]Slot          `json:"slots"`
 }
 
 type Slot struct {
-  Name        string      `json:"name"`
-  Value       string      `json:"value"`
-  Resolutions Resolutions `json:"resolutions"`
-  ConfirmationStatus  string `json:"confirmationStatus"`
-  Source      string      `json:"source"`
+  Name                  string                   `json:"name"`
+  Value                 string                   `json:"value"`
+  Resolutions           Resolutions              `json:"resolutions"`
+  ConfirmationStatus    string                   `json:"confirmationStatus"`
+  Source                string                   `json:"source"`
 }
 
 type Resolutions struct {
   ResolutionPerAuthority []struct {
-    Authority string `json:"authority"`
+    Authority           string                   `json:"authority"`
     Status struct {
-      Code string `json:"code"`
-    } `json:"status"`
+      Code              string                   `json:"code"`
+    }                                            `json:"status"`
     Values []struct {
       Value struct {
-        Name string `json:"name"`
-        Id   string `json:"id"`
-      } `json:"value"`
-    } `json:"values"`
-  } `json:"resolutionsPerAuthority"`
+        Name            string                   `json:"name"`
+        Id              string                   `json:"id"`
+      }                                          `json:"value"`
+    }                                            `json:"values"`
+  }                                              `json:"resolutionsPerAuthority"`
 }
 
 func (request AlexaRequest)GetRequestType() string {
@@ -153,14 +154,34 @@ func (request AlexaRequest)GetAttributes() *attributes.Attributes {
   return &(request.Session.Attributes)
 }
 
+func (request AlexaRequest)GetSlots() *map[string]Slot {
+  return &(request.Request.Intent.Slots)
+}
+
 func (request AlexaRequest)GetDisplay() interface{} {
   return request.Context.System.Device.SupportedInterfaces.Display
+}
+
+func (request AlexaRequest)HasDisplay() bool {
+  display := request.GetDisplay()
+  return !(display == nil || reflect.ValueOf(display).IsNil())
 }
 
 func (request AlexaRequest)GetVideo() interface{} {
   return request.Context.System.Device.SupportedInterfaces.VideoApp
 }
 
+func (request AlexaRequest)HasVideo() bool {
+  display := request.GetVideo()
+  return !(display == nil || reflect.ValueOf(display).IsNil())
+}
+
 func (request AlexaRequest)GetAPL() interface{} {
   return request.Context.System.Device.SupportedInterfaces.AlexaPresentationAPL
 }
+
+func (request AlexaRequest)HasAPL() bool {
+  display := request.GetAPL()
+  return !(display == nil || reflect.ValueOf(display).IsNil())
+}
+
