@@ -69,6 +69,7 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 
 TO DO:
 ======
+- Full Request Implementation
 - Full APL support (it works but not all the posibilities)
 - DynamoDB support to load/save attributes
 - Ask Amazon API for user data
@@ -76,6 +77,13 @@ TO DO:
 
 Version Changes Control
 =======================
+
+v0.0.3 - 2019-04-09
+-----------------------
+- Added HasVideo, HasDisplay and HasAPL in request implementation
+- Request, Intent and Slots ordered and cleaned
+- Added Request.GetSlots function
+
 
 v0.0.2 - 2019-04-08
 -----------------------
