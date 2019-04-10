@@ -20,7 +20,7 @@ const (
 // MAIN ALEXA RESPONSE STRUCTURE
 type AlexaResponse struct {
   Version               string                   `json:"version"`
-  SessionAttributes     *attributes.Attributes   `json:"sessionAttributes,omitempty"`      // map[string]interface{}, controlled by attributes module. can be empty
+  SessionAttributes     attributes.AttributesDef `json:"sessionAttributes,omitempty"`      // map[string]interface{}, controlled by attributes module. can be empty
   Response              Response                 `json:"response"`                         // response is mandatory (not a pointer *)
   UserAgent             string                   `json:"userAgent"`
 }
@@ -279,7 +279,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
 
 
 // Add things to the response
-func (r *AlexaResponse)AddAttributes(attributes *attributes.Attributes) *AlexaResponse {
+func (r *AlexaResponse)AddAttributes(attributes attributes.AttributesDef) *AlexaResponse {
   r.SessionAttributes = attributes
   return r
 }
