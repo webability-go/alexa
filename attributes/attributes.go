@@ -4,6 +4,8 @@ import (
   "fmt"
 )
 
+type AttributesDef interface{}
+
 type Attributes map[string]interface{}
 
 func (att *Attributes)Set(id string, val interface{}) {

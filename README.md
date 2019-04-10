@@ -87,6 +87,7 @@ v0.0.4 - 2019-04-10
 - Default CancelIntent and StopIntent now ends the skill (changed in default intents map)
 - APL builder enhanced, to build better the datasources, functions added: NewDataSet, NewDataList, NewDataListItem
 - APL builder: "properties" subset removed. If a properties subset si needed, please use NewDataSet("properties")
+- Attributes handler can be hijacked to unmarshal attributes into a custom structure instead of a map[string]interface{} structure
 
 
 v0.0.3 - 2019-04-09

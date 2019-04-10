@@ -2,6 +2,7 @@ package request
 
 import (
 //  "fmt"
+  "encoding/json"
   "reflect"
 
   "github.com/webability-go/alexa/attributes"
@@ -17,7 +18,7 @@ type AlexaRequest struct {
 type Session struct {
   New                   bool                     `json:"new"`
   SessionID             string                   `json:"sessionId"`
-  Attributes            attributes.Attributes    `json:"attributes"`
+  Attributes            attributes.AttributesDef `json:"attributes"`
   Application struct {
     ApplicationID       string                   `json:"applicationId,omitempty"`
   }                                              `json:"application"`
@@ -150,8 +151,8 @@ func (request AlexaRequest)GetLocale() string {
   return request.Request.Locale
 }
 
-func (request AlexaRequest)GetAttributes() *attributes.Attributes {
-  return &(request.Session.Attributes)
+func (request AlexaRequest)GetAttributes() attributes.AttributesDef {
+  return request.Session.Attributes
 }
 
 func (request AlexaRequest)GetSlots() *map[string]Slot {
@@ -184,4 +185,22 @@ func (request AlexaRequest)HasAPL() bool {
   display := request.GetAPL()
   return !(display == nil || reflect.ValueOf(display).IsNil())
 }
+
+/* =============================================================
+   UNMARSHAL THE REQUEST
+   =============================================================*/
+
+var UnmarshalHandler func(data []byte, s *Session) error = nil
+
+func SetUnmarshalHandlers(unmarshal func(data []byte, s *Session) error) {
+  UnmarshalHandler = unmarshal
+}
+
+func (s *Session)UnmarshalJSON(data []byte) error {
+  if UnmarshalHandler == nil {
+    return json.Unmarshal(data, s);
+  }
+  return UnmarshalHandler(data, s)
+}
+
 
