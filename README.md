@@ -69,6 +69,10 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 
 TO DO:
 ======
+- Makes Attributes as an INTERFACE so the developper can implement its own attributes
+- makes available Build attributes with user handler so the JSON can be unmarshalled into a personal structure, not just a map[string]inferface{}
+  OR maybe build something to upload the attributes into a user defined structure ??
+  OR build a func (w *Attributes) UnmarshalJSON(data []byte) error { on Attributes to handle the data and the user structure/functions
 - Full Request Implementation
 - Full APL support (it works but not all the posibilities)
 - DynamoDB support to load/save attributes
@@ -77,6 +81,13 @@ TO DO:
 
 Version Changes Control
 =======================
+
+v0.0.4 - 2019-04-10
+-----------------------
+- Default CancelIntent and StopIntent now ends the skill (changed in default intents map)
+- APL builder enhanced, to build better the datasources, functions added: NewDataSet, NewDataList, NewDataListItem
+- APL builder: "properties" subset removed. If a properties subset si needed, please use NewDataSet("properties")
+
 
 v0.0.3 - 2019-04-09
 -----------------------
@@ -91,6 +102,7 @@ v0.0.2 - 2019-04-08
 - Full implementation of BodyTemplate1, BodyTemplate2, BodyTemplate3 (WithToken, WithTitle, WithBackButton, WithImage, WithBackgroundImage, WithPrimaryText) 
 - Functions added to control DisplayImage and TextContent objects (WithSize, WithPrimaryText, WithSecondaryText, WithTertiaryText, AddSource)
 - Full implementation of ListTemplate1, ListTemplate2 and ListItem (WithToken, WithTitle, WithBackButton, WithImage, WithBackgroundImage, AddListItem) 
+
 
 V0.0.1 - 2019-04-04
 -----------------------

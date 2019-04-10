@@ -7,6 +7,11 @@ import (
   "encoding/json"
 )
 
+const (
+  APLDATATYPE = "Alexa.Presentation.APL.RenderDocument"
+  APLVERSION = "1.0"
+)
+
 type APLBuilder struct {
   Datatype string
   Version string
@@ -17,11 +22,12 @@ type APLBuilder struct {
 type APLDocument map[string]interface {}
 type APLDataSources map[string]interface {}
 type APLDataSource map[string]interface {}
+type APLDataSourceList []APLDataSource
 
-func NewAPLBuilder(datatype string, version string, document string, datasources *APLDataSources) *APLBuilder {
+func NewAPLBuilder(document string, datasources *APLDataSources) *APLBuilder {
   return &APLBuilder{
-    Datatype: datatype,
-    Version: version,
+    Datatype: APLDATATYPE,
+    Version: APLVERSION,
     Document: document,
     DataSources: datasources,
   }
@@ -31,16 +37,33 @@ func NewAPLDataSources() *APLDataSources {
   return &APLDataSources{}
 }
 
-func (ds *APLDataSources)NewAPLDataSource(id string, objecttype string) *APLDataSource {
+func (ds *APLDataSources)NewDataSource(id string, objecttype string) *APLDataSource {
   src := &APLDataSource{}
   (*src)["type"] = objecttype
-  (*src)["properties"] = make(map[string]interface{})
+  (*ds)[id] = src
+  return src
+}
+
+func (ds *APLDataSource)NewDataSet(id string) *APLDataSource {
+  src := &APLDataSource{}
   (*ds)[id] = src
   return src
 }
 
 func (ds *APLDataSource)AddData(id string, val interface{}) {
-  (*ds)["properties"].(map[string]interface{})[id] = val
+  (*ds)[id] = val
+}
+
+func (ds *APLDataSource)NewDataList(id string) *APLDataSourceList {
+  src := &APLDataSourceList{}
+  (*ds)[id] = src
+  return src
+}
+
+func (ds *APLDataSourceList)NewDataListItem() *APLDataSource {
+  src := &APLDataSource{}
+  *ds = append(*ds, *src)
+  return src
 }
 
 func (builder *APLBuilder) Build() Directive {
