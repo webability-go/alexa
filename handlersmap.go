@@ -58,7 +58,7 @@ func BuildDefaultMap() {
   HandlerIntentMap = map[string]func(request.AlexaRequest) *response.AlexaResponse {
     // ==== Common intents =====
     // ==== INTENTS ====
-    CancelIntent:             DefaultIntentHandler,
+    CancelIntent:             DefaultSessionEndedHandler,
     HelpIntent:               DefaultIntentHandler,
     LoopOffIntent:            DefaultIntentHandler,
     LoopOnIntent:             DefaultIntentHandler,
@@ -71,7 +71,7 @@ func BuildDefaultMap() {
     ShuffleOffIntent:         DefaultIntentHandler,
     ShuffleOnIntent:          DefaultIntentHandler,
     StartOverIntent:          DefaultIntentHandler,
-    StopIntent:               DefaultIntentHandler,
+    StopIntent:               DefaultSessionEndedHandler,
     YesIntent:                DefaultIntentHandler,
     // ==== DISPLAY HANDLERS INTENTS ====
     ScrollUpIntent:           DefaultIntentHandler,
