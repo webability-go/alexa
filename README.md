@@ -69,10 +69,6 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 
 TO DO:
 ======
-- Makes Attributes as an INTERFACE so the developper can implement its own attributes
-- makes available Build attributes with user handler so the JSON can be unmarshalled into a personal structure, not just a map[string]inferface{}
-  OR maybe build something to upload the attributes into a user defined structure ??
-  OR build a func (w *Attributes) UnmarshalJSON(data []byte) error { on Attributes to handle the data and the user structure/functions
 - Full Request Implementation
 - Full APL support (it works but not all the posibilities)
 - DynamoDB support to load/save attributes
@@ -81,6 +77,11 @@ TO DO:
 
 Version Changes Control
 =======================
+
+v0.0.5 - 2019-04-11
+-----------------------
+- NewTextResponse implemented. NewSSMLResponse removed. Please use NewTextResponse, the text can be a string or an SSMLBuilder, the system reacts intelligently to it and build the correct text string.
+
 
 v0.0.4 - 2019-04-10
 -----------------------
