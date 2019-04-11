@@ -222,12 +222,44 @@ func NewResponse(close bool) *AlexaResponse {
 // Some Common responses pre-build
 func NewTextResponse(text interface{}, close bool) *AlexaResponse {
 
+  ntype := ""
+  ntext := ""
+  switch text.(type) {
+    case *SSMLBuilder:
+      ntype = "SSML"
+      ntext = text.(*SSMLBuilder).Build()
+    case string:
+      ntype = analyzeText(text.(string))
+      ntext = text.(string)
+      if ntype == "SSML" {
+        if ntext[0:7] != "<speak>" {
+          ntext = "<speak>" + ntext
+        }
+        if ntext[len(ntext)-8:len(ntext)] != "</speak>" {
+          ntext += "</speak>"
+        }
+      }
+  }
 // be intelligent:
 // if text is string and no tags, simple text
 // if text is string and some tags: ssml text, check if <speak> is here and adds it if not
 // if text is ssml speech object, build it and inject it as ssml text
 
-  r := &AlexaResponse{}
+  r := &AlexaResponse{
+    Version: "1.0",
+    Response: Response{
+      OutputSpeech: &OutputSpeech{
+        Type: ntype,
+      },
+      ShouldEndSession: close,
+    },
+    UserAgent: GENERATOR,
+  }
+  if ntype == "SSML" {
+    r.Response.OutputSpeech.SSML = ntext
+  } else {
+    r.Response.OutputSpeech.Text = ntext
+  }
   return r
 }
 
