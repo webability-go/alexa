@@ -78,6 +78,11 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.0.6 - 2019-04-12
+-----------------------
+- Some bugs corrected on NewTextResponse on the text analyse to decode to correct type.
+
+
 v0.0.5 - 2019-04-11
 -----------------------
 - NewTextResponse implemented. NewSSMLResponse removed. Please use NewTextResponse, the text can be a string or an SSMLBuilder, the system reacts intelligently to it and build the correct text string.
