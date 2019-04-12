@@ -149,6 +149,18 @@ type DirectiveAPL struct {
 // *** APL templates implemented into apl.go
 
 // Structured elements functionality
+func analyzeSpeechText(text string) string {
+  
+  // if text contains < > tags, it's a rich text, if not, a normal text
+  posinf := strings.Index(text, "<")
+  possup := strings.Index(text, "<")
+  if posinf != -1 && possup != -1 {
+    return "SSML"
+  }
+  return "PlainText"
+}
+
+// Structured elements functionality
 func analyzeText(text string) string {
   
   // if text contains < > tags, it's a rich text, if not, a normal text
@@ -220,6 +232,10 @@ func NewResponse(close bool) *AlexaResponse {
 }
 
 // Some Common responses pre-build
+// Text response: be intelligent:
+// if text is string and no tags, simple text
+// if text is string and some tags: ssml text, check if <speak> is here and adds it if not
+// if text is ssml speech object, build it and inject it as ssml text
 func NewTextResponse(text interface{}, close bool) *AlexaResponse {
 
   ntype := ""
@@ -229,7 +245,7 @@ func NewTextResponse(text interface{}, close bool) *AlexaResponse {
       ntype = "SSML"
       ntext = text.(*SSMLBuilder).Build()
     case string:
-      ntype = analyzeText(text.(string))
+      ntype = analyzeSpeechText(text.(string))
       ntext = text.(string)
       if ntype == "SSML" {
         if ntext[0:7] != "<speak>" {
@@ -240,10 +256,6 @@ func NewTextResponse(text interface{}, close bool) *AlexaResponse {
         }
       }
   }
-// be intelligent:
-// if text is string and no tags, simple text
-// if text is string and some tags: ssml text, check if <speak> is here and adds it if not
-// if text is ssml speech object, build it and inject it as ssml text
 
   r := &AlexaResponse{
     Version: "1.0",
