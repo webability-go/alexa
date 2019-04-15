@@ -121,7 +121,7 @@ type Slot struct {
 }
 
 type Resolutions struct {
-  ResolutionPerAuthority []struct {
+  ResolutionsPerAuthority []struct {
     Authority           string                   `json:"authority"`
     Status struct {
       Code              string                   `json:"code"`
