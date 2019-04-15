@@ -124,6 +124,19 @@ type DirectiveAudioClearQueue struct {
   ClearBehavior         string                   `json:"playBehavior"`
 }
 
+// VIDEO PLAY DIRECTIVE
+type DirectiveVideoAppLaunch struct {
+  DirectiveCommon
+  VideoItem struct {
+    Source              string                   `json:"source"`
+    Metadata            *VideoMetadata           `json:"metadata,omitempty"`
+  }                                              `json:"videoItem"`
+}
+
+type VideoMetadata struct {
+  Title                 string                   `json:"title,omitempty"`
+  Subtitle              string                   `json:"subtitle,omitempty"`
+}
 
 // DIALOG DIRECTIVE -- not implemented yet
 
@@ -364,6 +377,14 @@ func (r *AlexaResponse)AddAPL(apl *APLBuilder) {
     r.Response.Directives = &[]Directive{res}
   } else {
     *r.Response.Directives = append(*r.Response.Directives, res)
+  }
+}
+
+func (r *AlexaResponse)AddVideo(video *DirectiveVideoAppLaunch) {
+  if r.Response.Directives == nil {
+    r.Response.Directives = &[]Directive{video}
+  } else {
+    *r.Response.Directives = append(*r.Response.Directives, video)
   }
 }
 

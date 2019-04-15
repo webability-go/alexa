@@ -78,6 +78,12 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.0.7 - 2019-04-15
+-----------------------
+- Video Directive implemented in response
+- Bug corrected on ResolutionsPerAuthority object in the request (missing an "s")
+
+
 v0.0.6 - 2019-04-12
 -----------------------
 - Some bugs corrected on NewTextResponse on the text analyse to decode to correct type.
@@ -123,6 +129,7 @@ V0.0.1 - 2019-04-04
 =======================
 
 Define Handlers map:
+======================
 
 ```
 package main
@@ -212,6 +219,7 @@ func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
 ```
 
 Attributes:
+======================
 
 ```
   // Before start:
@@ -234,18 +242,25 @@ Request data: ( pass the IsNil interface to alexa code with new functions HasDis
   
 
 Use attributes:
+======================
 
 ```
   att := Request.GetAttributes()
   ...
-  att["Seomthing"] = "Some data"
+  att["Something"] = "Some data"
 
   resp.AddAttributes(att)     // rename to SetAttributes ?   ADD should Ads something to a set of attributes.
    // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
    
 ```
 
+Hijack default attribute with your own attribute structure
+======================
+
+
+
 Locale:
+======================
 
 ```
 
