@@ -31,7 +31,7 @@ type Response struct {
   Card                  *Card                    `json:"card,omitempty"`
   Reprompt              *Reprompt                `json:"reprompt,omitempty"`
   Directives            *[]Directive             `json:"directives,omitempty"`
-  ShouldEndSession      bool                     `json:"shouldEndSession"`
+  ShouldEndSession      *bool                    `json:"shouldEndSession,omitempty"`
 }
 
 // Reprompt object
@@ -233,13 +233,15 @@ func (is *ImageSource)WithSize(size string, width int, height int) {
 
 
 // Basic Response creator
-func NewResponse(close bool) *AlexaResponse {
+func NewResponse(close *bool) *AlexaResponse {
   r := &AlexaResponse{
     Version: "1.0",
     Response: Response{
-      ShouldEndSession: close,
     },
     UserAgent: GENERATOR,
+  }
+  if close != nil {
+    r.Response.ShouldEndSession = close
   }
   return r
 }
@@ -276,7 +278,7 @@ func NewTextResponse(text interface{}, close bool) *AlexaResponse {
       OutputSpeech: &OutputSpeech{
         Type: ntype,
       },
-      ShouldEndSession: close,
+      ShouldEndSession: &close,
     },
     UserAgent: GENERATOR,
   }
@@ -298,7 +300,7 @@ func NewSSMLResponse(text string, close bool) *AlexaResponse {
         Type: "SSML",
         SSML: text,
       },
-      ShouldEndSession: close,
+      ShouldEndSession: &close,
     },
     UserAgent: GENERATOR,
   }
@@ -326,7 +328,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
         Title:   title,
         Content: text,
       },
-      ShouldEndSession: close,
+      ShouldEndSession: &close,
     },
     UserAgent: GENERATOR,
   }

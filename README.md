@@ -78,6 +78,10 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.0.8 - 2019-04-16
+-----------------------
+- ShouldEndSession parameter is now a *bool since it must be omited when the directive is a video launch. Code adjusted
+
 v0.0.7 - 2019-04-15
 -----------------------
 - Video Directive implemented in response
