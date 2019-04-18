@@ -78,9 +78,15 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.0.9 - 2019-04-18
+-----------------------
+- Removed ./attributes and code. Attributes is just an interface{} by default and can be used to store anything.
+
+
 v0.0.8 - 2019-04-16
 -----------------------
 - ShouldEndSession parameter is now a *bool since it must be omited when the directive is a video launch. Code adjusted
+
 
 v0.0.7 - 2019-04-15
 -----------------------

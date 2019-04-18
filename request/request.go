@@ -4,8 +4,6 @@ import (
 //  "fmt"
   "encoding/json"
   "reflect"
-
-  "github.com/webability-go/alexa/attributes"
 )
 
 type AlexaRequest struct {
@@ -18,7 +16,7 @@ type AlexaRequest struct {
 type Session struct {
   New                   bool                     `json:"new"`
   SessionID             string                   `json:"sessionId"`
-  Attributes            attributes.AttributesDef `json:"attributes"`
+  Attributes            interface{}              `json:"attributes"`
   Application struct {
     ApplicationID       string                   `json:"applicationId,omitempty"`
   }                                              `json:"application"`
@@ -151,7 +149,7 @@ func (request AlexaRequest)GetLocale() string {
   return request.Request.Locale
 }
 
-func (request AlexaRequest)GetAttributes() attributes.AttributesDef {
+func (request AlexaRequest)GetAttributes() interface{} {
   return request.Session.Attributes
 }
 
@@ -187,20 +185,32 @@ func (request AlexaRequest)HasAPL() bool {
 }
 
 /* =============================================================
-   UNMARSHAL THE REQUEST
+   HIJACK THE ATTRIBUTES UNMARSHAL ON THE REQUEST
    =============================================================*/
 
-var UnmarshalHandler func(data []byte, s *Session) error = nil
-
-func SetUnmarshalHandlers(unmarshal func(data []byte, s *Session) error) {
-  UnmarshalHandler = unmarshal
-}
+var SessionUnmarshalerHandler func(data []byte, s *Session) error = nil
 
 func (s *Session)UnmarshalJSON(data []byte) error {
-  if UnmarshalHandler == nil {
+  if SessionUnmarshalerHandler == nil {
     return json.Unmarshal(data, s);
+    return DefaultSessionUnmarshalerHandler(data, s);
   }
-  return UnmarshalHandler(data, s)
+  return SessionUnmarshalerHandler(data, s)
+}
+
+func DefaultSessionUnmarshalerHandler(data []byte, session *Session) error {
+  type Alias Session
+  aux := &struct {
+    Attributes map[string]interface{} `json:"attributes"`
+    *Alias
+  }{
+    Alias: (*Alias)(session),
+  }
+  if err := json.Unmarshal(data, &aux); err != nil {
+    return err
+  }
+  session.Attributes = aux.Attributes
+  return nil
 }
 
 
