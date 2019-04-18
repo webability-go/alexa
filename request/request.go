@@ -16,7 +16,7 @@ type AlexaRequest struct {
 type Session struct {
   New                   bool                     `json:"new"`
   SessionID             string                   `json:"sessionId"`
-  Attributes            interface{}              `json:"attributes"`
+  Attributes            map[string]interface{}              `json:"attributes"`
   Application struct {
     ApplicationID       string                   `json:"applicationId,omitempty"`
   }                                              `json:"application"`
