@@ -2,8 +2,6 @@ package response
 
 import (
   "strings"
-
-  "github.com/webability-go/alexa/attributes"
 )
 
 const (
@@ -20,7 +18,7 @@ const (
 // MAIN ALEXA RESPONSE STRUCTURE
 type AlexaResponse struct {
   Version               string                   `json:"version"`
-  SessionAttributes     attributes.AttributesDef `json:"sessionAttributes,omitempty"`      // map[string]interface{}, controlled by attributes module. can be empty
+  SessionAttributes     interface{}              `json:"sessionAttributes,omitempty"`      // can be empty (nil)
   Response              Response                 `json:"response"`                         // response is mandatory (not a pointer *)
   UserAgent             string                   `json:"userAgent"`
 }
@@ -315,7 +313,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
 // if text is ssml speech object, build it and inject it as ssml text
 
 // gets text for card from original text stripping tags and etc (some painter function to transform it)
-  
+  end := close
   r := &AlexaResponse{
     Version: "1.0",
     Response: Response{
@@ -328,7 +326,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
         Title:   title,
         Content: text,
       },
-      ShouldEndSession: &close,
+      ShouldEndSession: &end,
     },
     UserAgent: GENERATOR,
   }
@@ -338,7 +336,7 @@ func NewSimpleResponse(title string, text string, close bool) *AlexaResponse {
 
 
 // Add things to the response
-func (r *AlexaResponse)AddAttributes(attributes attributes.AttributesDef) *AlexaResponse {
+func (r *AlexaResponse)AddAttributes(attributes interface{}) *AlexaResponse {
   r.SessionAttributes = attributes
   return r
 }

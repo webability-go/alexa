@@ -2,6 +2,8 @@ package alexa
 
 import (
   "github.com/aws/aws-lambda-go/lambda"
+
+  "github.com/webability-go/alexa/request"
 )
 
 const VERSION = "0.0.8"
@@ -30,4 +32,13 @@ func Start() {
   }
   lambda.Start(DefaultHandler)
 }
+
+/* ==========================================================================
+   HIJACK THE SESSION UNMARSHAL ON THE REQUEST TO REPLACE ATTRIBUTES
+   ==========================================================================*/
+
+func SetSessionUnmarshalerHandler(unmarshaler func(data []byte, s *request.Session) error) {
+  request.SessionUnmarshalerHandler = unmarshaler
+}
+
 

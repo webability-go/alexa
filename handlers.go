@@ -10,6 +10,8 @@ import (
 
 func DefaultHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
 
+  fmt.Println("HANDLER: ", req)
+
   loc := req.GetLocale()
   messages := locale.Get(loc)
   requesttype := req.GetRequestType()
@@ -31,7 +33,7 @@ func DefaultLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
 func DefaultSessionEndedHandler(req request.AlexaRequest) *response.AlexaResponse {
   loc := req.GetLocale()
   messages := locale.Get(loc)
-  return response.NewSimpleResponse(messages.Get("Launch.Title"), messages.Get("Launch.Message"), true)
+  return response.NewSimpleResponse(messages.Get("SessionEnded.Title"), messages.Get("SessionEnded.Message"), true)
 }
 
 func DefaultIntentTypeHandler(req request.AlexaRequest) *response.AlexaResponse {
