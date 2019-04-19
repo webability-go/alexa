@@ -6,7 +6,7 @@ import (
   "github.com/webability-go/alexa/request"
 )
 
-const VERSION = "0.0.8"
+const VERSION = "0.0.9"
 
 var DEVEL = false
 

@@ -78,9 +78,10 @@ TO DO:
 Version Changes Control
 =======================
 
-v0.0.9 - 2019-04-18
+v0.0.9 - 2019-04-19
 -----------------------
 - Removed ./attributes and code. Attributes is just an interface{} by default and can be used to store anything.
+- The hijack function works now correctly to build an app own attributes structure
 
 
 v0.0.8 - 2019-04-16

@@ -16,7 +16,7 @@ type AlexaRequest struct {
 type Session struct {
   New                   bool                     `json:"new"`
   SessionID             string                   `json:"sessionId"`
-  Attributes            map[string]interface{}              `json:"attributes"`
+  Attributes            interface{}              `json:"attributes,omitempty"`
   Application struct {
     ApplicationID       string                   `json:"applicationId,omitempty"`
   }                                              `json:"application"`
@@ -187,30 +187,23 @@ func (request AlexaRequest)HasAPL() bool {
 /* =============================================================
    HIJACK THE ATTRIBUTES UNMARSHAL ON THE REQUEST
    =============================================================*/
-
 var SessionUnmarshalerHandler func(data []byte, s *Session) error = nil
 
 func (s *Session)UnmarshalJSON(data []byte) error {
   if SessionUnmarshalerHandler == nil {
-    return json.Unmarshal(data, s);
-    return DefaultSessionUnmarshalerHandler(data, s);
+    type Alias Session
+    aux := &struct {
+      Attributes map[string]interface{} `json:"attributes,omitempty"`
+      *Alias
+    }{
+      Alias: (*Alias)(s),
+    }
+    if err := json.Unmarshal(data, &aux); err != nil {
+      return err
+    }
+    s.Attributes = aux.Attributes
+    return nil
   }
   return SessionUnmarshalerHandler(data, s)
 }
-
-func DefaultSessionUnmarshalerHandler(data []byte, session *Session) error {
-  type Alias Session
-  aux := &struct {
-    Attributes map[string]interface{} `json:"attributes"`
-    *Alias
-  }{
-    Alias: (*Alias)(session),
-  }
-  if err := json.Unmarshal(data, &aux); err != nil {
-    return err
-  }
-  session.Attributes = aux.Attributes
-  return nil
-}
-
 
