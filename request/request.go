@@ -141,6 +141,10 @@ func (request AlexaRequest)GetRequestIntentName() string {
   return request.Request.Intent.Name
 }
 
+func (request AlexaRequest)GetSessionId() string {
+  return request.Session.SessionID
+}
+
 func (request AlexaRequest)GetNewSession() bool {
   return request.Session.New
 }
