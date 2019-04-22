@@ -3,10 +3,11 @@ package alexa
 import (
   "github.com/aws/aws-lambda-go/lambda"
 
+  "github.com/webability-go/alexa/dynamodb"
   "github.com/webability-go/alexa/request"
 )
 
-const VERSION = "0.0.9"
+const VERSION = "0.1.0"
 
 var DEVEL = false
 
@@ -26,11 +27,15 @@ func init() {
 }
 
 // Anything we need to make alexa work
-func Start() {
-  if ddb_tablename != "" {
-    StartDynamoTable()
+func Start() error {
+  if dynamodb.DDB_tablename != "" {
+    err := dynamodb.StartDynamoTable()
+    if err != nil {
+      return err
+    }
   }
   lambda.Start(DefaultHandler)
+  return nil
 }
 
 /* ==========================================================================
