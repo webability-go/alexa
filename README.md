@@ -78,6 +78,11 @@ TO DO:
 Version Changes Control
 =======================
 
+v0.1.0 - 2019-04-22
+-----------------------
+- DynamoDB implemented to manage attributes persistance
+
+
 v0.0.9 - 2019-04-19
 -----------------------
 - Removed ./attributes and code. Attributes is just an interface{} by default and can be used to store anything.
