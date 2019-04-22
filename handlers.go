@@ -10,7 +10,7 @@ import (
 
 func DefaultHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
 
-  fmt.Println("HANDLER: ", req)
+//  fmt.Println("HANDLER: ", req)
 
   loc := req.GetLocale()
   messages := locale.Get(loc)
