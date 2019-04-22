@@ -149,6 +149,10 @@ func (request AlexaRequest)GetNewSession() bool {
   return request.Session.New
 }
 
+func (request AlexaRequest)GetUserId() string {
+  return request.Session.User.UserID
+}
+
 func (request AlexaRequest)GetLocale() string {
   return request.Request.Locale
 }

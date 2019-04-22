@@ -18,8 +18,13 @@ var DDB_client *dynamodb.DynamoDB
 
 // Dynamo for alexa params structure
 type dynamoalexa struct {
-  id string
-  attributes interface{}
+  ID                    string                   `json:"id"`
+  Attributes            interface{}              `json:"attributes"`
+}
+
+// Dynamo for alexa query structure by key
+type dynamoqueryalexa struct {
+  ID                    string                   `json:"id"`
 }
 
 func OpenSession() {
@@ -38,19 +43,11 @@ func CreateTable() error {
             AttributeName: aws.String("id"),
             AttributeType: aws.String("S"),
         },
-        {
-            AttributeName: aws.String("attributes"),
-            AttributeType: aws.String("S"),
-        },
     },
     KeySchema: []*dynamodb.KeySchemaElement{
         {
             AttributeName: aws.String("id"),
             KeyType:       aws.String("HASH"),
-        },
-        {
-            AttributeName: aws.String("attributes"),
-            KeyType:       aws.String("RANGE"),
         },
     },
     ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
@@ -77,6 +74,7 @@ func VerifyTable() error {
   for _, n := range result.TableNames {
     if *n == DDB_tablename {
       found = true
+      break
     }
   }
   if !found {
@@ -105,13 +103,13 @@ func StartDynamoTable() error {
   return nil
 }
 
-func Select(id string) (interface{}, error) {
+func Select(id string, container interface{}) error {
   
-  da := &dynamoalexa{id:  id,}
+  da := &dynamoqueryalexa{ID:  id,}
 
   key, err := dynamodbattribute.MarshalMap(da)
   if err != nil {
-    return nil, err
+    return err
   }
 
   input := &dynamodb.GetItemInput{
@@ -121,32 +119,29 @@ func Select(id string) (interface{}, error) {
 
   result, err := DDB_client.GetItem(input)
   if err != nil {
-    return nil, err
+    return err
   }
 
-  attributes := &dynamoalexa{}
+  attributes := &dynamoalexa{Attributes: container}
   err = dynamodbattribute.UnmarshalMap(result.Item, attributes)
-  if err != nil {
-    return nil, err
-  }
-
-  return attributes.attributes, nil
-}
-
-func Upsert(id string, data interface{}) error {
-  
-  da := &dynamoalexa{ id: id, attributes: data,}
-  
-  av, err := dynamodbattribute.MarshalMap(da)
   if err != nil {
     return err
   }
 
+  return nil
+}
+
+func Upsert(id string, data interface{}) error {
+  
+  da := &dynamoalexa{ ID: id, Attributes: data,}
+  av, err := dynamodbattribute.MarshalMap(da)
+  if err != nil {
+    return err
+  }
   input := &dynamodb.PutItemInput{
     Item:      av,
     TableName: aws.String(DDB_tablename),
   }
-
   _, err = DDB_client.PutItem(input)
   if err != nil {
     return err

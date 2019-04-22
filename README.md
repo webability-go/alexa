@@ -70,9 +70,8 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 TO DO:
 ======
 - Full Request Implementation
-- Full APL support (it works but not all the posibilities)
-- DynamoDB support to load/save attributes
-- Ask Amazon API for user data
+- Full APL support (it works but not all the posibilities i.e. transformers)
+- Finish the implementation of Amazon API for user data
 
 
 Version Changes Control
@@ -80,7 +79,7 @@ Version Changes Control
 
 v0.1.0 - 2019-04-22
 -----------------------
-- DynamoDB implemented to manage attributes persistance
+- DynamoDB implemented to manage attributes persistance: create table, LoadPersistentAttributes, SavePersistentAttributes
 
 
 v0.0.9 - 2019-04-19

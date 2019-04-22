@@ -19,11 +19,11 @@ func WithAutoCreateTable(auto bool) {
 }
 
 func SavePersistentAttributes(req request.AlexaRequest, data interface{}) error {
-  id := req.GetSessionId()
-  dynamodb.Upsert(id, data)
-  return nil
+  id := req.GetUserId()
+  return dynamodb.Upsert(id, data)
 }
 
-func LoadPersistentAttributes(req request.AlexaRequest) (interface{}, error) {
-  return nil, nil
+func LoadPersistentAttributes(req request.AlexaRequest, container interface{}) error {
+  id := req.GetUserId()
+  return dynamodb.Select(id, container)
 }
