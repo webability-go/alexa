@@ -68,19 +68,19 @@ type Context struct {
   /* Check documentation for those objects */
   Viewport struct {
     Experiences []struct {
-      ArcMinuteWidth int `json:"arcMinuteWidth"`
-      ArcMinuteHeight int `json:"arcMinuteHeight"`
-      CanRotate bool `json:"canRotate"`
-      CanResize bool `json:"canResize"`
-    } `json:"experiences"`
-    Shape string `json:"shape"`
-    PixelWidth int `json:"pixelWidth"`
-    PixelHeight int `json:"pixelHeight"`
-    DPI int `json:"dpi"`
-    CurrentPixelWidth int `json:"currentPixelWidth"`
-    CurrentPixelHeight int `json:"currentPixelHeight"`
-    Touch []string `json:"touch"`
-  } `json:"Viewport,omitempty"`
+      ArcMinuteWidth    int                      `json:"arcMinuteWidth"`
+      ArcMinuteHeight   int                      `json:"arcMinuteHeight"`
+      CanRotate         bool                     `json:"canRotate"`
+      CanResize         bool                     `json:"canResize"`
+    }                                            `json:"experiences"`
+    Shape               string                   `json:"shape"`
+    PixelWidth          int                      `json:"pixelWidth"`
+    PixelHeight         int                      `json:"pixelHeight"`
+    DPI                 int                      `json:"dpi"`
+    CurrentPixelWidth   int                      `json:"currentPixelWidth"`
+    CurrentPixelHeight  int                      `json:"currentPixelHeight"`
+    Touch               []string                 `json:"touch"`
+  }                                              `json:"Viewport,omitempty"`
   Display struct {
     Token string `json:"token,omitempty"`
   } `json:"Display,omitempty"`
@@ -92,16 +92,19 @@ type Request struct {
   RequestID             string                   `json:"requestId"`
   Timestamp             string                   `json:"timestamp"`
   Locale                string                   `json:"locale"`
-  // we ignore target for now
-  // we ignore metadata for now
+  // Intent request
   Intent                Intent                   `json:"intent,omitempty"`
-  // we ignore body for now
-  // we ignore payload for now
-  // we ignore targetURI for now
-  // we ignore launchRequestType for now
-  // we ignore shouldLinkResultBeReturned for now
-  // Reason      string `json:"reason,omitempty"` we ignore for now
-  DialogState string `json:"dialogState,omitempty"`
+  DialogState           string                   `json:"dialogState,omitempty"`
+
+  // Ended session request
+  Reason                string                   `json:"reason,omitempty"`
+  Error                 map[string]string        `json:"error,omitempty"`
+  
+  // Audio player request
+  Token                 string                   `json:"token,omitempty"`
+  OffsetInMilliseconds  int                      `json:"offsetInMilliseconds,omitempty"`
+  
+  // implements other needed type of requests: game request, gadget request, playback request...
 }
 
 type Intent struct {
@@ -201,7 +204,7 @@ func (s *Session)UnmarshalJSON(data []byte) error {
   if SessionUnmarshalerHandler == nil {
     type Alias Session
     aux := &struct {
-      Attributes map[string]interface{} `json:"attributes,omitempty"`
+      Attributes        map[string]interface{}   `json:"attributes,omitempty"`
       *Alias
     }{
       Alias: (*Alias)(s),

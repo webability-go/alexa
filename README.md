@@ -69,18 +69,29 @@ Refer to the full manual to implement your intents, use the SDK, framework and m
 
 TO DO:
 ======
-- Full Request Implementation
-- Full APL support (it works but not all the posibilities i.e. transformers)
-- Finish the implementation of Amazon API for user data
+Important:
+- Implement Permission cards
+- Full APL support (it works but not all the posibilities i.e. missing transformers)
+Not so important:
+- Finish the implementation of Amazon API for user data (still missing todo lists and shopping lists)
+- Verify beta intent request canfulfillintentrequest for english skills
+- Verify special requests (game requests, playback requests, gadgets requests)
+- Gadget controlers responses ( i.e. buttons )
 
 
 Version Changes Control
 =======================
 
+v0.2.0 - 2019-04-29
+-----------------------
+- Added Fallback Handlers
+- Added error propagation on all the handlers to be more compliant with error management. If you catch the error and manage it, then you should return "nil" as error parameter. 
+- The error is captured and modified into the default main handler, and transformed to a voice error message. This can be deactivated with the SetErrorCapture(false) function
+
 v0.1.0 - 2019-04-22
 -----------------------
 - DynamoDB implemented to manage attributes persistance: create table, LoadPersistentAttributes, SavePersistentAttributes
-
+- Amazon API implemented (name, fullname, email, mobile number, address, country, timezone, distanceunit, temperatureunit)
 
 v0.0.9 - 2019-04-19
 -----------------------
@@ -162,13 +173,13 @@ import (
 func main()
 {
   // Handlers types:
-  alexa.AddHandlersType(map[string]func(request.AlexaRequest) *response.AlexaResponse {
+  alexa.AddHandlersType(map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
     alexa.LaunchRequest: yourLaunchHandler,
     alexa.SessionEndedRequest: yourSessionEndedHandler,
   })
 
   // Handlers intents:
-  alexa.AddHandlersIntent(map[string]func(request.AlexaRequest) *response.AlexaResponse {
+  alexa.AddHandlersIntent(map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
     // native intents
     alexa.CancelIntent:                  yourCancelIntentHandler,
     alexa.StopIntent:                    yourCancelIntentHandler,
@@ -192,7 +203,7 @@ func main()
 // ======================================================================
 // EXAMPLE: LAUNCH HANDLER
 // ======================================================================
-func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
+func yourLaunchHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
 
   resp := response.NewResponse(false)   // false: launch does not close the skill
 
@@ -226,7 +237,7 @@ func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
   apl := response.NewAPLBuilder( "Alexa.Presentation.APL.RenderDocument", "1.0", "./application/apl/yourapl.json", aplsources )
   resp.AddAPL(apl);
   
-  return resp
+  return resp, nil
 }
 
 // all the other defined handlers
@@ -237,14 +248,18 @@ Attributes:
 ======================
 
 ```
+  const REGION = "us-east-1"
+  const TABLENAME = "my_dynamo_table"
+
   // Before start:
   alexa.WithDynamoDbClient("latest", REGION)
-  alexa.WithTableName(KIWITABLA)
+  alexa.WithTableName(TABLENAME)
   alexa.WithAutoCreateTable(true)
   alexa.Start()
 ```
 
-Request data: ( pass the IsNil interface to alexa code with new functions HasDisplay, HasVideo, HasAPL )
+Request data:
+======================
 
 ```
   display := Request.GetDisplay()          // object
@@ -260,18 +275,32 @@ Use attributes:
 ======================
 
 ```
-  att := Request.GetAttributes()
-  ...
-  att["Something"] = "Some data"
+   // load persistent attributes with dynamoDB
 
+
+  // no persistent attributes ? load the request attributes
+  att := Request.GetAttributes()
+
+  ...
+
+  // play with attributes
+  att["Something"] = "Some data"
+  // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
+
+  // Add the attributes to the response
   resp.AddAttributes(att)     // rename to SetAttributes ?   ADD should Ads something to a set of attributes.
-   // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
+   
+   // set persistent attributes with dynamoDB
+   
    
 ```
 
 Hijack default attribute with your own attribute structure
 ======================
 
+```
+
+```
 
 
 Locale:
@@ -284,14 +313,38 @@ Locale:
 Build a Speech / SSML
 ======================
 
+```
+
+```
+
 Build a Card
 ======================
+
+```
+
+```
 
 Build a Template
 ======================
 
+```
+
+```
+
 Build an APL
 ======================
+
+```
+
+```
+
+API User data:
+======================
+
+```
+
+```
+
 
 
 ---

@@ -7,9 +7,10 @@ import (
   "github.com/webability-go/alexa/request"
 )
 
-const VERSION = "0.1.0"
+const VERSION = "0.2.0"
 
 var DEVEL = false
+var ERRORCAPTURE = true
 
 /*
   Alexa Lamdba Library Manager for GO
@@ -36,6 +37,10 @@ func Start() error {
   }
   lambda.Start(DefaultHandler)
   return nil
+}
+
+func SetErrorCapture(status bool) {
+  ERRORCAPTURE = status
 }
 
 /* ==========================================================================
