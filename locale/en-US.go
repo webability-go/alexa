@@ -5,6 +5,9 @@ var en_US = Lang {
   "RequestTypeNotFound":  "Request type is not implemented. Because of the error the skill will close. The type is: ",
   "IntentNameNotFound":   "Intent is not implemented. Because of the error the skill will close. The intent name is: ",
   
+  "Fallback.Title":       "Fallback handler",
+  "Fallback.Message":     "The alexa system did not find any handler for this request.",
+
   "Launch.Title":         "Launch Handler",
   "Launch.Message":       "Alexa Skill Default Launch Handler.",
   

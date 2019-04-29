@@ -10,6 +10,8 @@ The SDK support all type of Alexa Requests, Attributes and Responses.
 The Framework is multilanguage, supports SSML, Cards, Templates and APLs
 The Framework comes also with all default intents pre-programmed (they answer the name of the intent) for basic operation.
 
+Full manual is below.
+
 First start:
 
 Enter in your go environment and install the needed libraries:
@@ -64,23 +66,34 @@ User: "End skill"
 Alexa: "Alexa Skill Default Handler For CancelIntent. Goodbye"
 ```
 
-Refer to the full manual to implement your intents, use the SDK, framework and much more.
+Refer to the full manual below to implement your intents, use the SDK, framework and much more.
 
 
 TO DO:
 ======
-- Full Request Implementation
-- Full APL support (it works but not all the posibilities i.e. transformers)
-- Finish the implementation of Amazon API for user data
+Important:
+- Implement Permission cards
+- Full APL support (it works but not all the posibilities i.e. missing transformers)
+Not so important:
+- Finish the implementation of Amazon API for user data (still missing todo lists and shopping lists)
+- Verify beta intent request canfulfillintentrequest for english skills
+- Verify special requests (game requests, playback requests, gadgets requests)
+- Gadget controlers responses ( i.e. buttons )
 
 
 Version Changes Control
 =======================
 
+v0.2.0 - 2019-04-29
+-----------------------
+- Added Fallback Handlers
+- Added error propagation on all the handlers to be more compliant with error management. If you catch the error and manage it, then you should return "nil" as error parameter. 
+- The error is captured and modified into the default main handler, and transformed to a voice error message. This can be deactivated with the SetErrorCapture(false) function
+
 v0.1.0 - 2019-04-22
 -----------------------
 - DynamoDB implemented to manage attributes persistance: create table, LoadPersistentAttributes, SavePersistentAttributes
-
+- Amazon API implemented (name, fullname, email, mobile number, address, country, timezone, distanceunit, temperatureunit)
 
 v0.0.9 - 2019-04-19
 -----------------------
@@ -143,8 +156,8 @@ V0.0.1 - 2019-04-04
 # Reference Manual:
 =======================
 
-Define Handlers map:
-======================
+Define your own Handlers map:
+=======================
 
 ```
 package main
@@ -162,13 +175,14 @@ import (
 func main()
 {
   // Handlers types:
-  alexa.AddHandlersType(map[string]func(request.AlexaRequest) *response.AlexaResponse {
-    alexa.LaunchRequest: yourLaunchHandler,
-    alexa.SessionEndedRequest: yourSessionEndedHandler,
+  alexa.AddHandlersType(map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
+    alexa.LaunchRequest:                 yourLaunchHandler,
+    alexa.SessionEndedRequest:           yourSessionEndedHandler,
+    alexa.Fallback:                      yourFallbackHandler,
   })
 
   // Handlers intents:
-  alexa.AddHandlersIntent(map[string]func(request.AlexaRequest) *response.AlexaResponse {
+  alexa.AddHandlersIntent(map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
     // native intents
     alexa.CancelIntent:                  yourCancelIntentHandler,
     alexa.StopIntent:                    yourCancelIntentHandler,
@@ -184,6 +198,10 @@ func main()
     "yourOwnIntent":                     yourOwnIntentHandler,
     "anotherCurtomIntent":               yourAnotherCustomIntentHandler,
     "navigationIntent":                  yourNavigationIntentHandler,
+    
+    // fallback
+    alexa.Fallback:                      yourFallbackIntentHandler,
+
   })
 
   alexa.Start()
@@ -192,7 +210,7 @@ func main()
 // ======================================================================
 // EXAMPLE: LAUNCH HANDLER
 // ======================================================================
-func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
+func yourLaunchHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
 
   resp := response.NewResponse(false)   // false: launch does not close the skill
 
@@ -226,7 +244,7 @@ func yourLaunchHandler(req request.AlexaRequest) *response.AlexaResponse {
   apl := response.NewAPLBuilder( "Alexa.Presentation.APL.RenderDocument", "1.0", "./application/apl/yourapl.json", aplsources )
   resp.AddAPL(apl);
   
-  return resp
+  return resp, nil
 }
 
 // all the other defined handlers
@@ -237,14 +255,18 @@ Attributes:
 ======================
 
 ```
+  const REGION = "us-east-1"
+  const TABLENAME = "my_dynamo_table"
+
   // Before start:
   alexa.WithDynamoDbClient("latest", REGION)
-  alexa.WithTableName(KIWITABLA)
+  alexa.WithTableName(TABLENAME)
   alexa.WithAutoCreateTable(true)
   alexa.Start()
 ```
 
-Request data: ( pass the IsNil interface to alexa code with new functions HasDisplay, HasVideo, HasAPL )
+Request data:
+======================
 
 ```
   display := Request.GetDisplay()          // object
@@ -260,18 +282,90 @@ Use attributes:
 ======================
 
 ```
-  att := Request.GetAttributes()
-  ...
-  att["Something"] = "Some data"
+  att := &MySkillAttributes{}    // if hijacked , (see example below)
 
+  // load persistent attributes with dynamoDB
+  err := alexa.LoadPersistentAttributes(req, att)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  // no persistent attributes ? load the request attributes
+  att := Request.GetAttributes()
+
+  ...
+
+  // play with attributes
+  att["Something"] = "Some data"
+  // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
+
+  // Add the attributes to the response
   resp.AddAttributes(att)     // rename to SetAttributes ?   ADD should Ads something to a set of attributes.
-   // Create att.AddData, GetData AddString, GetString, GetBool, GetInt etc (or use xcore.DataSet)
+   
+  // set persistent attributes with dynamoDB
+  err := alexa.SavePersistentAttributes(req, att)
+  if err != nil {
+    fmt.Println(err)
+  }
    
 ```
 
 Hijack default attribute with your own attribute structure
 ======================
 
+```
+func main() {
+
+  alexa.SetSessionUnmarshalerHandler(AttributesHijack)   // Custom attributes
+  err := alexa.Start()
+  if err != nil {
+    fmt.Println(err)
+  }
+}
+
+type MySkillAttributes struct {
+  Version             int            // attributes version
+  Sessions            int            // Quantity of launched sessions
+  First               time.Time      // First use of the skill
+  Last                time.Time      // Last use of the skill
+}
+
+func AttributesHijack(data []byte, session *request.Session) error {
+  
+  type Alias request.Session
+  aux := &struct {
+    Attributes *MySkillAttributes `json:"attributes"`
+    *Alias
+  }{
+    Alias: (*Alias)(session),
+  }
+  if err := json.Unmarshal(data, &aux); err != nil {
+    return err
+  }
+  session.Attributes = aux.Attributes
+  return nil
+}
+
+
+func yourIntentHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
+
+  MyAttributes := req.GetAttributes().(*MySkillAttributes)    // is now a MySkillAttributes, not a default map[string]interface{}
+  (*MyAttributes).Sessions ++
+
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support SSML (mandatory)
+  speech := response.NewSSMLBuilder()
+  speech.Say("Hello " + givenname)
+  resp.AddSpeech(speech);
+  
+  resp.AddAttributes(MyAttributes)
+  
+  return rest, nil
+}
+
+
+```
 
 
 Locale:
@@ -279,19 +373,158 @@ Locale:
 
 ```
 
+func yourIntentHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
+
+  loc := req.GetLocale()
+
+  // You can implement locale dependant translation table for your skill texts
+
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support SSML (mandatory)
+  speech := response.NewSSMLBuilder()
+  speech.Say("Your locale is " + loc)
+  resp.AddSpeech(speech);
+  
+  return rest, nil
+}
+
 ```
 
 Build a Speech / SSML
 ======================
 
+Every function you call on a builder will ADDs the message to the output
+
+```
+
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // SSML build
+  speech := response.NewSSMLBuilder()
+  // adds a raw text (syntax is supposed to be "good")
+  speech.Raw("<s>Welcome to Demo Skill</s> <say-as interpret-as="cardinal">12345</say-as>. <say-as interpret-as='spell-out'>hello</say-as>.")
+  
+  // Simple text
+  speech.Say("Welcome to Demo Skill")
+
+  // With a break
+  speech.Break("0.5s")
+
+  // sentence
+  speech.Say("This is a sentence")
+  speech.SetSentence()   // apply on previous "Say"
+  
+  // paragraph
+  speech.Say("This is a paragraph")
+  speech.SetParagraph()   // apply on previous "Say"
+  
+  
+  speech.Say("This is a text with lots of effects")
+  speech.AddEffect("whispered")    // apply on previous "Say"     values in Alexa developpers SSML Manuals
+  speech.AddEmphasis("moderate")   // apply on previous "Say"     values in Alexa developpers SSML Manuals
+  speech.AddLang("fr-FR")          // apply on previous "Say"     values in Alexa developpers SSML Manuals
+  speech.AddVoice("Kendra")        // apply on previous "Say"     values in Alexa developpers SSML Manuals
+  
+  speech.Say("12345")
+  speech.AddSayAs("spell-out")
+  
+  // Finally adds an audio sound
+  speech.Audio("soundbank://soundlibrary/animals/amzn_sfx_bear_groan_roar_01")
+  
+  resp.AddSpeech(speech);
+
+```
+
 Build a Card
 ======================
+
+```
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support CARD
+  card := response.NewCardBuilder( "Welcome", "Welcome to Demo Skill", "https://yourcdn.com/icon-1024.png", "https://yourcdn.com/icon-192.png" )
+
+  resp.AddCard(card);
+  
+
+```
 
 Build a Template
 ======================
 
+```
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support TEMPLATE
+  template := response.NewTemplateBuilder("BodyTemplate3").(*response.BodyTemplate3)
+  template.WithTitle("Example:")
+  template.WithImage("https://yourcdn.com/icon-1024.png");
+  template.WithPrimaryRichText("<div align='center'>Help.<br/>Start over.<br/>Close the skill.</div>");
+
+  resp.AddTemplate(template);
+
+```
+
 Build an APL
 ======================
+
+```
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support APL
+  aplsources := response.NewAPLDataSources()
+  apldata := aplsources.NewAPLDataSource("welcomedata", "object")
+  apldata.AddData("logo", "https://yourcdn.com/icon-192.png")
+  apldata.AddData("image", "https://yourcdn.com/icon-1024.png")
+  apldata.AddData("maintitle", "Welcome")
+  apldata.AddData("titleshort", "Examples:")
+  apldata.AddData("title", "Examples of what you can say:")
+  apldata.AddData("subtitle", "Search something, Make an action like that:")
+  apldata.AddData("primaryText", "Help.<br/>Start over.<br/>Close the skill.<br/>Say something intelligent.")
+  
+  apl := response.NewAPLBuilder( "Alexa.Presentation.APL.RenderDocument", "1.0", "./application/apl/yourapl.json", aplsources )
+  resp.AddAPL(apl);
+
+```
+
+API User data:
+======================
+
+Every API data is supposed to be authorized by the user of the skill
+
+** Note: permission cards are still not implemented.
+
+The timezone, distante and temperatureunit does not need authorization.
+
+
+```
+
+func yourIntentHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
+
+  fullname, _ := alexa.GetAccountFullName(req)
+  givenname, _ := alexa.GetAccountGivenName(req)
+  fullname, _ := alexa.GetAccountEmail(req)
+  number, _ := alexa.GetAccountMobileNumber(req)
+  country, _ := alexa.GetDeviceCountry(req)
+  address, _ := alexa.GetDeviceAddress(req)
+  timezon, _ := alexa.GetDeviceTimeZone(req)
+  distunit, _ := alexa.GetDeviceDistanceUnit(req)
+  tempunit, _ := alexa.GetDeviceTemperatureUnit(req)
+
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support SSML (mandatory)
+  speech := response.NewSSMLBuilder()
+  speech.Say("Hello " + givenname)
+  resp.AddSpeech(speech);
+  
+  return rest, nil
+}
+
+
+```
+
 
 
 ---

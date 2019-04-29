@@ -10,6 +10,7 @@ const (
   LaunchRequest             = "LaunchRequest"
   SessionEndedRequest       = "SessionEndedRequest"
   IntentRequest             = "IntentRequest"
+  Fallback                  = "Fallback"
 
   // Intents names
   CancelIntent              = "AMAZON.CancelIntent"
@@ -41,22 +42,27 @@ const (
   ElementSelectedHandler    = "AMAZON.ElementSelectedHandler"
 )
 
-var HandlerTypeMap map[string]func(request.AlexaRequest) *response.AlexaResponse
-var HandlerIntentMap map[string]func(request.AlexaRequest) *response.AlexaResponse
+var HandlerTypeMap map[string]func(request.AlexaRequest) (*response.AlexaResponse, error)
+var HandlerIntentMap map[string]func(request.AlexaRequest) (*response.AlexaResponse, error)
 
 /* You should node edit this map file, but use the functions to assign handlers instead */
 
 func BuildDefaultMap() {
-  HandlerTypeMap = map[string]func(request.AlexaRequest) *response.AlexaResponse {
+  HandlerTypeMap = map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
     // ==== Common types =====
+    Fallback:                 DefaultFallbackHandler,
     // ==== REQUESTS ====
     LaunchRequest:            DefaultLaunchHandler,
     SessionEndedRequest:      DefaultSessionEndedHandler,
     IntentRequest:            DefaultIntentTypeHandler,
+    
+    // ==== Custom handlers =====
+    // Add all the custom type handlers you need with the functions
   }
 
-  HandlerIntentMap = map[string]func(request.AlexaRequest) *response.AlexaResponse {
+  HandlerIntentMap = map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) {
     // ==== Common intents =====
+    Fallback:                 DefaultFallbackHandler,
     // ==== INTENTS ====
     CancelIntent:             DefaultSessionEndedHandler,
     HelpIntent:               DefaultIntentHandler,
@@ -91,21 +97,21 @@ func BuildDefaultMap() {
   }
 }
 
-func AddHandlerType(id string, fct func(request.AlexaRequest) *response.AlexaResponse) {
+func AddHandlerType(id string, fct func(request.AlexaRequest) (*response.AlexaResponse, error) ) {
   HandlerTypeMap[id] = fct
 }
 
-func AddHandlersType(m map[string]func(request.AlexaRequest) *response.AlexaResponse) {
+func AddHandlersType(m map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) ) {
   for i, v := range(m) {
     HandlerTypeMap[i] = v
   }
 }
 
-func AddHandlerIntent(id string, fct func(request.AlexaRequest) *response.AlexaResponse) {
+func AddHandlerIntent(id string, fct func(request.AlexaRequest) (*response.AlexaResponse, error) ) {
   HandlerIntentMap[id] = fct
 }
 
-func AddHandlersIntent(m map[string]func(request.AlexaRequest) *response.AlexaResponse) {
+func AddHandlersIntent(m map[string]func(request.AlexaRequest) (*response.AlexaResponse, error) ) {
   for i, v := range(m) {
     HandlerIntentMap[i] = v
   }
