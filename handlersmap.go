@@ -39,7 +39,7 @@ const (
   NavigateHomeIntent        = "AMAZON.NavigateHomeIntent"
   NavigateSettingsIntent    = "AMAZON.NavigateSettingsIntent"
     // ==== LOCAL DEVICE NOTIFICATION ====
-  ElementSelectedHandler    = "AMAZON.ElementSelectedHandler"
+  ElementSelectedHandler    = "Display.ElementSelected"
 )
 
 var HandlerTypeMap map[string]func(request.AlexaRequest) (*response.AlexaResponse, error)
@@ -55,6 +55,8 @@ func BuildDefaultMap() {
     LaunchRequest:            DefaultLaunchHandler,
     SessionEndedRequest:      DefaultSessionEndedHandler,
     IntentRequest:            DefaultIntentTypeHandler,
+    // ==== LOCAL DEVICE NOTIFICATION ====
+    ElementSelectedHandler:   DefaultFallbackHandler,
     
     // ==== Custom handlers =====
     // Add all the custom type handlers you need with the functions
@@ -89,8 +91,6 @@ func BuildDefaultMap() {
     MoreIntent:               DefaultIntentHandler,
     NavigateHomeIntent:       DefaultIntentHandler,
     NavigateSettingsIntent:   DefaultIntentHandler,
-    // ==== LOCAL DEVICE NOTIFICATION ====
-    ElementSelectedHandler:   DefaultIntentHandler,
 
     // ==== Custom intents =====
     // Add all the intents you need with the functions

@@ -7,7 +7,7 @@ import (
   "github.com/webability-go/alexa/request"
 )
 
-const VERSION = "0.2.0"
+const VERSION = "0.3.0"
 
 var DEVEL = false
 var ERRORCAPTURE = true

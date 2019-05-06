@@ -2,7 +2,7 @@
 
 # Alexa Ready to use SDK and Framework for GO
 
-Alexa v0
+Alexa v0.3
 =============================
 
 The library is a full SDK with a framework, ready to deploy a lambda function on Amazon AWS to build a skill.
@@ -74,6 +74,8 @@ TO DO:
 Important:
 - Implement Permission cards
 - Full APL support (it works but not all the posibilities i.e. missing transformers)
+- API calls for basic data (device datas)
+
 Not so important:
 - Finish the implementation of Amazon API for user data (still missing todo lists and shopping lists)
 - Verify beta intent request canfulfillintentrequest for english skills
@@ -84,16 +86,25 @@ Not so important:
 Version Changes Control
 =======================
 
+v0.3.0 - 2019-05-06
+-----------------------
+- Alexa API working (get user account email, name, full name, mobile number implemented)
+- Permission cards implemented
+- Some minor bugs corrected
+
+
 v0.2.0 - 2019-04-29
 -----------------------
 - Added Fallback Handlers
 - Added error propagation on all the handlers to be more compliant with error management. If you catch the error and manage it, then you should return "nil" as error parameter. 
 - The error is captured and modified into the default main handler, and transformed to a voice error message. This can be deactivated with the SetErrorCapture(false) function
 
+
 v0.1.0 - 2019-04-22
 -----------------------
 - DynamoDB implemented to manage attributes persistance: create table, LoadPersistentAttributes, SavePersistentAttributes
 - Amazon API implemented (name, fullname, email, mobile number, address, country, timezone, distanceunit, temperatureunit)
+
 
 v0.0.9 - 2019-04-19
 -----------------------
