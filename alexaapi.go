@@ -53,34 +53,23 @@ func accessAPI(endPoint string, service string, token string) ([]byte, error) {
   }
   resp.Body.Close()
   
-  fmt.Println(string(data))
+  fmt.Println("RAW DATA", string(data))
   return data, nil
-  
-  aux := struct {
-    Code string `json:"code"`
-    Message string  `json:"message"`
-    Data string  `json:"data"`
-  }{}
-  if err := json.Unmarshal(data, &aux); err != nil {
-    // notify error
-    return nil, err
-  }
-  if aux.Code != "" {
-    return nil, errors.New(aux.Code + " " + aux.Message)
-  }
-  return nil, nil
-  
-//  return aux.Data, nil
 }
 
-func accessAccountAPI(request *request.AlexaRequest, service string) (map[string]interface{}, error) {
+func accessAccountAPI(request *request.AlexaRequest, service string) (interface{}, error) {
   accessToken := getAPIAccessToken(request);
   endPoint := getAPIEndPoint(request);
   if accessToken == "" || endPoint == "" {
-    return nil, nil
+    return "", errors.New("Error: There is no api endPoint or accessToken in the request.")
   }
-  accessAPI(endPoint, service, accessToken)
-  return nil, nil
+  jsonstring, err := accessAPI(endPoint, service, accessToken)
+  var data interface{}
+  err = json.Unmarshal(jsonstring, &data)
+  if err != nil {
+    return "", err
+  }
+  return data, nil
 }
 
 func accessDeviceAddressAPI(request *request.AlexaRequest, service string) (map[string]interface{}, error) {
@@ -99,29 +88,78 @@ func accessDeviceAPI(request *request.AlexaRequest, service string) (map[string]
   if accessToken == "" || endPoint == "" {
     return nil, nil
   }
-  accessAPI(endPoint, service, accessToken)
-  return nil, nil
+  jsonstring, err := accessAPI(endPoint, service, accessToken)
+  if err != nil {
+    return nil, err
+  }
+  var data map[string]interface{}
+  err = json.Unmarshal(jsonstring, data)
+  if err != nil {
+    return nil, err
+  }
+  
+  fmt.Println("ARRAY DATA", data)
+  return data, nil
 }
 
 /* ACCOUNT API */
 func GetAccountFullName(request *request.AlexaRequest) (string, error) {
-  accessAccountAPI(request, APINAME)
-  return "", nil
+  data, err := accessAccountAPI(request, APINAME)
+  if err != nil {
+    return "", err
+  }
+  switch data.(type) {
+    case string:
+      return data.(string), nil
+    case map[string]interface{}:
+      return "", errors.New(fmt.Sprint(data))
+  }
+  return "", errors.New("Data type no reconocido: " + fmt.Sprint(data))
 }
 
 func GetAccountGivenName(request *request.AlexaRequest) (string, error) {
-  accessAccountAPI(request, APIGIVENNAME)
-  return "", nil
+  data, err := accessAccountAPI(request, APIGIVENNAME)
+  if err != nil {
+    return "", err
+  }
+  switch data.(type) {
+    case string:
+      return data.(string), nil
+    case map[string]interface{}:
+      return "", errors.New(fmt.Sprint(data))
+  }
+  return "", errors.New("Data type no reconocido: " + fmt.Sprint(data))
 }
 
 func GetAccountEmail(request *request.AlexaRequest) (string, error) {
-  accessAccountAPI(request, APIEMAIL)
-  return "", nil
+  data, err := accessAccountAPI(request, APIEMAIL)
+  if err != nil {
+    return "", err
+  }
+  switch data.(type) {
+    case string:
+      return data.(string), nil
+    case map[string]interface{}:
+      return "", errors.New(fmt.Sprint(data))
+  }
+  return "", errors.New("Data type no reconocido: " + fmt.Sprint(data))
 }
 
-func GetAccountMobileNumber(request *request.AlexaRequest) (string, error) {
-  accessAccountAPI(request, APIMOBILENUMBER)
-  return "", nil
+func GetAccountMobileNumber(request *request.AlexaRequest) (map[string]interface{}, error) {
+  data, err := accessAccountAPI(request, APIMOBILENUMBER)
+  if err != nil {
+    return nil, err
+  }
+  switch data.(type) {
+    case map[string]interface{}:
+      ndata := data.(map[string]interface{})
+      _, ok := ndata["countryCode"]
+      if (!ok) {
+        return nil, errors.New(fmt.Sprint(data))
+      }
+      return ndata, nil
+  }
+  return nil, errors.New("Data type no reconocido: " + fmt.Sprint(data))
 }
 
 /* DEVICE ADDRESS AND COUNTRY */

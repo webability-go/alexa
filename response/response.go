@@ -51,7 +51,8 @@ type Card struct {
   Title                 string                   `json:"title,omitempty"`
   Content               string                   `json:"content,omitempty"`
   Text                  string                   `json:"text,omitempty"`
-  Image                 *CardImage               `json:"image,omitempty"`                 // optional
+  Image                 *CardImage               `json:"image,omitempty"`
+  Permissions           []string                 `json:"permissions,omitempty"`
 }
 
 // Images for a card
