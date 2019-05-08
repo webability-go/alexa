@@ -86,6 +86,12 @@ Not so important:
 Version Changes Control
 =======================
 
+v0.3.1 - 2019-05-08
+-----------------------
+- Alexa API Settings working (timezone, distance and temperature units)
+- Alexa API Address implemented (not fully working yet)
+- Response Permission cards added for address and country/postal code
+
 v0.3.0 - 2019-05-06
 -----------------------
 - Alexa API working (get user account email, name, full name, mobile number implemented)
