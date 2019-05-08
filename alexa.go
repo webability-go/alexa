@@ -7,7 +7,7 @@ import (
   "github.com/webability-go/alexa/request"
 )
 
-const VERSION = "0.3.0"
+const VERSION = "0.3.1"
 
 var DEVEL = false
 var ERRORCAPTURE = true
@@ -21,7 +21,6 @@ var ERRORCAPTURE = true
   2019-03-27: Phil, Creation
   2019-04-01: Phil, Add Dynamodb support
 */
-
 
 func init() {
   BuildDefaultMap()

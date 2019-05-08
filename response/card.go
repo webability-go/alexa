@@ -5,6 +5,8 @@ const (
   PERMISSION_FIRSTNAME = "alexa::profile:given_name:read"
   PERMISSION_EMAIL = "alexa::profile:email:read"
   PERMISSION_MOBILE = "alexa::profile:mobile_number:read"
+  PERMISSION_COUNTRY_AND_POSTAL_CODE = "read::alexa:device:all:address:country_and_postal_code"
+  PERMISSION_ADDRESS = "read::alexa:device:all:address"
 )
 
 type CardBuilder struct {
