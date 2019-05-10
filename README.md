@@ -72,9 +72,9 @@ Refer to the full manual below to implement your intents, use the SDK, framework
 TO DO:
 ======
 Important:
-- Implement Permission cards
 - Full APL support (it works but not all the posibilities i.e. missing transformers)
-- API calls for basic data (device datas)
+- Get user account address and country still not totally working
+- Implement Dynamic Entities for Customized Interactions
 
 Not so important:
 - Finish the implementation of Amazon API for user data (still missing todo lists and shopping lists)
@@ -86,11 +86,17 @@ Not so important:
 Version Changes Control
 =======================
 
+v0.3.2 - 2019-05-10
+-----------------------
+- Upgrade documentation with all previous changes
+
+
 v0.3.1 - 2019-05-08
 -----------------------
 - Alexa API Settings working (timezone, distance and temperature units)
 - Alexa API Address implemented (not fully working yet)
 - Response Permission cards added for address and country/postal code
+
 
 v0.3.0 - 2019-05-06
 -----------------------
@@ -286,12 +292,25 @@ Request data:
 ======================
 
 ```
-  display := Request.GetDisplay()          // object
-  video := Request.GetVideo()              // object
-  apl := Request.GetAPL()                  // object
 
-  newSession := Request.GetNewSession()    // bool
-  locale := Request.GetLocale()            // string es_MX
+  reqtype        := Request.GetRequestType()            // string
+  intentname     := Request.GetRequestIntentName()      // string
+  sessionid      := Request.GetSessionId()              // string
+  isnewsession   := Request.GetNewSession()             // bool
+  userid         := Request.GetUserId()                 // string
+  attributes     := Request.GetAttributes()             // object
+  slots          := Request.GetSlots()                  // *map[string]Slot
+
+  display        := Request.GetDisplay()                // object
+  video          := Request.GetVideo()                  // object
+  apl            := Request.GetAPL()                    // object
+  hasdisplay     := Request.HasDisplay()                // bool
+  hasvideo       := Request.HasVideo()                  // bool
+  hasapl         := Request.HasAPL()                    // bool
+
+  newSession     := Request.GetNewSession()             // bool
+  locale         := Request.GetLocale()                 // string es_MX
+
 ```
   
 
@@ -453,6 +472,7 @@ Every function you call on a builder will ADDs the message to the output
 
 ```
 
+
 Build a Card
 ======================
 
@@ -463,9 +483,37 @@ Build a Card
   card := response.NewCardBuilder( "Welcome", "Welcome to Demo Skill", "https://yourcdn.com/icon-1024.png", "https://yourcdn.com/icon-192.png" )
 
   resp.AddCard(card);
-  
 
 ```
+
+Build a Permission Card
+======================
+
+```
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // permission CARD
+  card := response.NewPermissionCardBuilder([]string{response.PERMISSION_EMAIL, response.PERMISSION_FIRSTNAME,})
+
+  resp.AddCard(card);
+
+```
+
+Possible permissions:
+
+```
+const (
+  PERMISSION_FULLNAME = "alexa::profile:name:read"
+  PERMISSION_FIRSTNAME = "alexa::profile:given_name:read"
+  PERMISSION_EMAIL = "alexa::profile:email:read"
+  PERMISSION_MOBILE = "alexa::profile:mobile_number:read"
+  PERMISSION_COUNTRY_AND_POSTAL_CODE = "read::alexa:device:all:address:country_and_postal_code"
+  PERMISSION_ADDRESS = "read::alexa:device:all:address"
+)
+```
+
+
+
 
 Build a Template
 ======================
@@ -482,6 +530,27 @@ Build a Template
   resp.AddTemplate(template);
 
 ```
+
+Build a Template with a list
+======================
+
+```
+  resp := response.NewResponse(false)   // false: launch does not close the skill
+
+  // support TEMPLATE
+  template := response.NewTemplateBuilder("ListTemplate1").(*response.ListTemplate1)
+  template.WithTitle("Select Something:")
+  template.WithPrimaryRichText("<div align='center'>Help.<br/>Start over.<br/>Close the skill.</div>")
+  template.AddListItem("Element 1", "https://yourcdn.com/icon1-1024.png", "The name of your item 1")
+  template.AddListItem("Element 2", "https://yourcdn.com/icon2-1024.png", "The name of your item 2")
+  template.AddListItem("Element 3", "https://yourcdn.com/icon3-1024.png", "The name of your item 3")
+  template.AddListItem("Element 4", "https://yourcdn.com/icon4-1024.png", "The name of your item 4")
+  template.AddListItem("Element 5", "https://yourcdn.com/icon5-1024.png", "The name of your item 5")
+
+  resp.AddTemplate(template);
+
+```
+
 
 Build an APL
 ======================
@@ -505,15 +574,29 @@ Build an APL
 
 ```
 
-API User data:
+
+Launch a video
+======================
+
+```
+
+  var resp *response.AlexaResponse
+
+  video := &response.DirectiveVideoAppLaunch{}
+  video.Type = "VideoApp.Launch"
+  video.VideoItem.Source = "Your_Video_Source_MP4_or_M3U"
+  video.VideoItem.Metadata = &response.VideoMetadata{ Title: "Title of the video", Subtitle: "Description of the video" }
+  resp.AddVideo(video);
+
+```
+
+
+Consume Alexa/Amazon APIs
 ======================
 
 Every API data is supposed to be authorized by the user of the skill
 
-** Note: permission cards are still not implemented.
-
 The timezone, distante and temperatureunit does not need authorization.
-
 
 ```
 
@@ -521,11 +604,11 @@ func yourIntentHandler(req request.AlexaRequest) (*response.AlexaResponse, error
 
   fullname, _ := alexa.GetAccountFullName(req)
   givenname, _ := alexa.GetAccountGivenName(req)
-  fullname, _ := alexa.GetAccountEmail(req)
+  email, _ := alexa.GetAccountEmail(req)
   number, _ := alexa.GetAccountMobileNumber(req)
-  country, _ := alexa.GetDeviceCountry(req)
+  country_and_postalcode, _ := alexa.GetDeviceCountry(req)
   address, _ := alexa.GetDeviceAddress(req)
-  timezon, _ := alexa.GetDeviceTimeZone(req)
+  timezone, _ := alexa.GetDeviceTimeZone(req)
   distunit, _ := alexa.GetDeviceDistanceUnit(req)
   tempunit, _ := alexa.GetDeviceTemperatureUnit(req)
 
@@ -538,7 +621,6 @@ func yourIntentHandler(req request.AlexaRequest) (*response.AlexaResponse, error
   
   return rest, nil
 }
-
 
 ```
 
