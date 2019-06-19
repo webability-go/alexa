@@ -93,15 +93,32 @@ func (builder *SSMLBuilder) Build() string {
   for _, ssml := range builder.SSML {
     switch ssml.datatype {
       case "ssml":
-        return ssml.text
+        response += ssml.text
       case "text":
+        if ssml.voice != "" {
+          response += "<voice name=\""+ssml.voice+"\">"
+        }
+        if ssml.effect != "" {
+          response += "<amazon:effect name=\""+ssml.effect+"\">"
+        }
+        
         response += ssml.text + " "
+        
+        if ssml.effect != "" {
+          response += "</amazon:effect>"
+        }
+        if ssml.voice != "" {
+          response += "</voice>"
+        }
       case "break":
         response += "<break time='" + ssml.text + "ms'/> "
       case "audio":
         response += "<audio src='" + ssml.text + "'/> "
     }
   }
-  return "<speak>" + response + "</speak>"
+  if response[0:5] != "<spea" {
+    return "<speak>" + response + "</speak>"
+  }
+  return response
 }
 

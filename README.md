@@ -86,6 +86,10 @@ Not so important:
 Version Changes Control
 =======================
 
+v0.3.3 - 2019-06-19
+-----------------------
+- Response.ssml enhanced to support some effects and raw text
+
 v0.3.2 - 2019-05-10
 -----------------------
 - Upgrade documentation with all previous changes
