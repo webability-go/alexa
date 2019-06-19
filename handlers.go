@@ -2,6 +2,8 @@ package alexa
 
 import (
   "fmt"
+  "encoding/json"
+
   
   "github.com/webability-go/alexa/locale"
   "github.com/webability-go/alexa/request"
@@ -11,7 +13,8 @@ import (
 func DefaultHandler(req request.AlexaRequest) (*response.AlexaResponse, error) {
 
   if DEVEL {
-    fmt.Println("HANDLER: ", req)
+    d, _ := json.Marshal(req)
+    fmt.Println("HANDLER: ", string(d))
   }
 
   loc := req.GetLocale()

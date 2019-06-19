@@ -100,7 +100,7 @@ type Request struct {
   Reason                string                   `json:"reason,omitempty"`
   Error                 map[string]string        `json:"error,omitempty"`
   
-  // Audio player request
+  // Audio player request and others
   Token                 string                   `json:"token,omitempty"`
   OffsetInMilliseconds  int                      `json:"offsetInMilliseconds,omitempty"`
   
