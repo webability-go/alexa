@@ -2,7 +2,7 @@
 
 # Alexa Ready to use SDK and Framework for GO
 
-Alexa v0.3
+Alexa v0.4
 =============================
 
 The library is a full SDK with a framework, ready to deploy a lambda function on Amazon AWS to build a skill.
@@ -543,6 +543,7 @@ v0.4.0 - 2020-02-25
 -----------------------
 - Licence added
 - Few changes for publication
+- Few bugs corrected
 
 v0.3.3 - 2019-06-19
 -----------------------
